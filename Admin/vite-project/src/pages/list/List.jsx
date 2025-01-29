@@ -20,14 +20,23 @@ const List = () => {
     }
   };
 
-  const removefood = async(foodId) =>{
-    console.log(foodId);
-  }
+  const removefood = async (foodId) => {
+    try {
+      const response = await axios.post(`${url}/api/food/remove`, { id: foodId });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        fetchList(); // Refresh list after removing an item
+      } else {
+        toast.error("Error removing food");
+      }
+    } catch (error) {
+      console.error("Remove Error:", error);
+      toast.error("Failed to remove food");
+    }
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      fetchList();
-    }, 2000);
+    fetchList();
   }, []);
 
   console.log("List state:", list); // Debugging
@@ -54,7 +63,7 @@ const List = () => {
               <p>{item.name || "No Name"}</p>
               <p>{item.category || "Uncategorized"}</p>
               <p>${item.price || "0.00"}</p>
-              <p onClick={()=>removefood(item._id)} className="cursor">X</p>
+              <p onClick={() => removefood(item._id)} className="cursor">X</p>
             </div>
           ))
         ) : (
