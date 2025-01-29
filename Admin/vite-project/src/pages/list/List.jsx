@@ -10,22 +10,13 @@ const List = () => {
   const fetchList = async () => {
     try {
       const response = await axios.get(`${url}/api/food/list`);
-      console.log(response.data);
-
-      if (response.data.success && Array.isArray(response.data.data)) {
+      if (response.data.success) {
         setList([...response.data.data]); // Spread to trigger state change
       } else {
         toast.error("Error fetching data");
       }
     } catch (error) {
-      const response = await axios.post(`${url}/api/food/remove`,{id:foodId});
-      await fetchList();
-      if(response.data.success) {
-        toast.success(response.data.message)
-      }
-      else {
-        toast.error("Error")
-      }
+      console.log(error)
     }
   };
 
