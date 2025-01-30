@@ -12,7 +12,7 @@ const List = () => {
       const response = await axios.get(`${url}/api/food/list`);
       console.log(response.data);
 
-      if (response.data.success && Array.isArray(response.data.data)) {
+      if (response.data.sucess && Array.isArray(response.data.data)) {
         setList([...response.data.data]); // Spread to trigger state change
       } else {
         toast.error("Error fetching data");
@@ -56,7 +56,7 @@ const List = () => {
         </div>
         {list.length > 0 ? (
           list.map((item, index) => (
-            <div key={item.id || index} className="list-table-form">
+            <div key={item.id || index} className="list-table-format">
               <img
                 src={`${url}/images/${item.image}`}
                 alt={item.name || "Food Image"}
