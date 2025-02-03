@@ -6,6 +6,8 @@ import Placeholder from './pages/placeholder/Placeholder.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Footer from './components/footer/Footer.jsx';
 import Logininpop from './components/loginpopup/Logininpop.jsx';
+import Verify from './pages/verify/Verify.jsx';
+import Myorder from './pages/myorder/Myorder.jsx';
 function App() {
 
     const [ShowLogin, setShowLogin] = useState(false);
@@ -19,6 +21,8 @@ function App() {
                         <Route path='/' element={<Home />} />
                         <Route path='/cart' element={<Cart />} />
                         <Route path='/order' element={<Placeholder />} />
+                        <Route path='/verify' element={<Verify/>}/>
+                        <Route path='/myorders' element={<Myorder/>}/>
                     </Routes>
                 </Router>
             </div>
