@@ -52,7 +52,7 @@ const Placeholder = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (token) {
-      navigate('/cart')
+      navigate('/order')
     }
     else if(getTotalCartAmount()===0)
     {
