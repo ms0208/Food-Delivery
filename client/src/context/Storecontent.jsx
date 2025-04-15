@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import axios from 'axios';
 export const StoreContext = createContext(null);
- 
+
 const StoreContextProvider = (props) => {
     const [Cartitems, setCartitems] = useState({});
     const url = "http://localhost:4000";
@@ -15,15 +15,15 @@ const StoreContextProvider = (props) => {
         else {
             setCartitems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }))
         }
-        if(token){
-            await axios.post(url+"/api/cart/add",{itemId},{headers:{token}});
+        if (token) {
+            await axios.post(url + "/api/cart/add", { itemId }, { headers: { token } });
         }
-    } 
+    }
 
     const removefromCart = async (itemId) => {
         setCartitems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
-        if(token){
-            await axios.post(url+"/api/cart/remove",{itemId},{headers:{token}});
+        if (token) {
+            await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
         }
     }
 
@@ -31,18 +31,20 @@ const StoreContextProvider = (props) => {
         let totalAmount = 0;
         for (const item in Cartitems) {
             if (Cartitems[item] > 0) {
-                let itemInfo = food_list.find((product) => product._id === item);
-                totalAmount += itemInfo.price * Cartitems[item];
+                let itemInfo = food_list.find((product) => String(product._id) === String(item));
+                if (itemInfo) {
+                    totalAmount += itemInfo.price * Cartitems[item];
+                }
             }
         }
         return totalAmount;
     }
     const fetchFoodList = async () => {
-       const response = await axios.get(url+"/api/food/list");
+        const response = await axios.get(url + "/api/food/list");
         setFoodlist(response.data.data);
     }
-    const loadCartData = async(token)=>{
-        const response = await axios.post(url+"/api/cart/get",{},{headers:{token}})
+    const loadCartData = async (token) => {
+        const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } })
         setCartitems(response.data.cardData);
     }
     useEffect(() => {

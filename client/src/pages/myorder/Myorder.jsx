@@ -1,18 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react'
-import './Myorder.css'
+import React, { useContext, useEffect, useState } from 'react';
+import './Myorder.css';
 import axios from 'axios';
 import { StoreContext } from '../../context/Storecontent.jsx';
-import {assets} from '../../Assets/frontend_assets/assets.js';
-const Myorder = () => {
+import { assets } from '../../Assets/frontend_assets/assets.js';
 
+const Myorder = () => {
     const [data, setData] = useState([]);
     const { url, token } = useContext(StoreContext);
 
     const fetchOrders = async () => {
-        const response = await axios.post('http://localhost:4000/api/order/userorders',{},{headers: { token } });
-        setData(response.data.data);
-        console.log(response.data.data); 
-    }
+        try {
+            const response = await axios.post('http://localhost:4000/api/order/userorders', {}, {
+                headers: { token }
+            });
+            console.log("Response:", response.data);
+            setData(response.data.data || []);
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+        }
+    };
 
     useEffect(() => {
         if (token) {
@@ -24,29 +30,31 @@ const Myorder = () => {
         <div className='My-orders'>
             <h2>My Orders</h2>
             <div className='container'>
-                {data.map((order,index)=>{
+                {data.map((order, index) => {
+                    // Guard against undefined or non-array items
+                    if (!Array.isArray(order.items)) return null;
+
                     return (
                         <div key={index} className='my-orders-order'>
-                            <img src={assets.parcel_icon} alt=""/>
-                            <p>{order.items.map((item,index)=>{
-                                if(index === order.items.length-1){
-                                    return item.name+" x "+item.quantity
-                                }
-                                else {
-                                    return item.name+" x "+item.quantity+", "
-                                }
-                            })}</p>
+                            <img src={assets.parcel_icon} alt="Parcel" />
+                            <p>
+                                {order.items.map((item, idx) => (
+                                    idx === order.items.length - 1
+                                        ? `${item.name} x ${item.quantity}`
+                                        : `${item.name} x ${item.quantity}, `
+                                ))}
+                            </p>
                             <p>${order.amount}.00</p>
                             <p>Items: {order.items.length}</p>
                             <p><span>&#x25cf;</span> <b>{order.status}</b></p>
                             <button onClick={fetchOrders}>Track Order</button>
                         </div>
-                    )
+                    );
                 })}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Myorder;
 

@@ -4,13 +4,13 @@ import bodyParser from 'body-parser';
 import { connectDB } from './config/db.js';
 import foodRouter from './routers/foodrouter.js';
 import userRouter from './routers/userrouter.js';
-import 'dotenv/config'
+import dotenv from 'dotenv';
 import cartRouter from './routers/cartrouter.js';
 import orderRouter from './routers/orderrouter.js';
-
+dotenv.config();
 // app config
 const app = express();
-const port = 4000
+const port = process.env.PORT;
 
 
 // middleware

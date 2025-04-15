@@ -1,11 +1,13 @@
 import orderModel from '../models/ordermodel.js';
 import userModel from '../models/usermodel.js';
 import Stripe from 'stripe'
+import dotenv from 'dotenv'
+dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
-// Place order
+// Place order frontend 
 
 const placeOrder = async (req, res) => {
     try {
@@ -53,7 +55,8 @@ const placeOrder = async (req, res) => {
         console.log(error);
         res.json({success:false,message:"Error"});
     }
-}
+} 
+// frontend
 const verifyOrder = async(req,res) => { 
     const {orderId,success} = req.body;
     try{
@@ -91,7 +94,7 @@ const listOrders = async(req,res)=>{
         res.json({success:false,message:"Error"}); 
     }
 }
-// api for updating order status
+// api for updating order status for admin pannel
 const updateStatus = async (req,res) =>{
     try {
         await orderModel.findByIdAndUpdate(req.body.orderId,{status:req.body.status});
