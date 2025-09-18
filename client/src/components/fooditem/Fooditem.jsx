@@ -5,10 +5,12 @@ import { StoreContext } from '../../context/Storecontent.jsx';
 const Fooditem = ({ id, name, price, description, image }) => {
   const url = "http://localhost:4000"
   const { Cartitems, addtoCart, removefromCart } = useContext(StoreContext);
+  console.log("Cartitems in Fooditem:", Cartitems);
+  console.log("Item ID:", id);
   return (
     <div className='food-item'>
       <div className='food-item-img-container'>
-        <img className='food-item-img' src={url+"/images/"+image} alt='' />
+        <img className='food-item-img' src={url + "/images/" + image} alt='' />
         {!Cartitems[id]
           ? <img className='add' onClick={() => addtoCart(id)} src={assets.add_icon_white} />
           : <div className='food-item-counter'>

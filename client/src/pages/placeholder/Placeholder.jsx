@@ -3,6 +3,7 @@ import './Placeholder.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { StoreContext } from '../../context/Storecontent.jsx';
+
 const Placeholder = () => {
   const { getTotalCartAmount, token, food_list, Cartitems, url } = useContext(StoreContext);
   const [data, setData] = useState({
@@ -15,69 +16,94 @@ const Placeholder = () => {
     zipcode: "",
     country: "",
     phone: ""
-  })
+  });
+  const navigate = useNavigate();
+
   const onChangeHandler = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setData(data => ({ ...data, [name]: value }))
-  }
-  // useEffect(()=>{
-  //   console.log(data);
-  // },[data])
+    setData((data) => ({ ...data, [name]: value }));
+  };
+
+  // Place order handler
   const placeorder = async (event) => {
     event.preventDefault();
+
     let orderItems = [];
-    food_list.map((item) => {
-      if (Cartitems[item._id] > 0) {
-        let itemInfo = item;
-        itemInfo["quantity"] = Cartitems[item._id];
-        orderItems.push(itemInfo)
+    food_list.forEach((item) => {
+      if (Cartitems?.[item._id] > 0) {
+        let itemInfo = { ...item, quantity: Cartitems[item._id] };
+        orderItems.push(itemInfo);
       }
-    })
-    // console.log(orderItems);
+    });
+
     let orderData = {
       address: data,
       items: orderItems,
-      amount: getTotalCartAmount() + 2
+      amount: getTotalCartAmount() + 2, // Assuming a delivery fee of $2
+    };
+
+    try {
+      // Ensure token is available
+      if (!token) {
+        alert("You must be logged in to place an order.");
+        navigate('/login');
+        return;
+      }
+
+      // Sending the order request
+      let response = await axios.post(url + '/api/order/place', orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (response.data.success) {
+        const { session_url } = response.data;
+        window.location.replace(session_url);
+      } else {
+        alert("Error: " + response.data.message);
+      }
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.message === "Not Authorized, login again") {
+        alert("Your session has expired. Please log in again.");
+        localStorage.removeItem('token'); // Clear the token from localStorage
+        navigate('/login'); // Redirect to login page
+      } else {
+        console.error("Error in placeorder:", error);
+        alert("Error in placing order");
+      }
     }
-    let response = await axios.post(url + '/api/order/place', orderData, { headers: { token } });
-    if (response.data.success) {
-      const { session_url } = response.data;
-      window.location.replace(session_url);
-    }
-    else {
-      alert("Error");
-    }
-  }
-  const navigate = useNavigate();
+  };
+
+  // Effect to handle redirection based on token and cart amount
   useEffect(() => {
-    if (token) {
-      navigate('/order')
+    if (!token) {
+      navigate('/login'); // Redirect to login if not authenticated
+    } else if (getTotalCartAmount() === 0) {
+      navigate('/cart'); // Redirect to cart if there are no items in the cart
     }
-    else if(getTotalCartAmount()===0)
-    {
-      navigate('/cart');
-    }
-  }, [token])
+  }, [token, getTotalCartAmount(), navigate]);
+
   return (
     <form onSubmit={placeorder} className='place-order'>
       <div className="place-order-left">
         <p className='title'>Delivery Information</p>
         <div className="multi-fields">
-          < input required name='firstName' onChange={onChangeHandler} value={data.firstName} type='text' placeholder='First Name' />
-          < input required name='lastName' onChange={onChangeHandler} value={data.lastName} type='text' placeholder='Last Name' />
+          <input required name='firstName' onChange={onChangeHandler} value={data.firstName} type='text' placeholder='First Name' />
+          <input required name='lastName' onChange={onChangeHandler} value={data.lastName} type='text' placeholder='Last Name' />
         </div>
-        < input required name='email' onChange={onChangeHandler} value={data.email} type='email' placeholder='Email address' />
-        < input required name='street' onChange={onChangeHandler} value={data.street} type='text' placeholder='Street' />
+        <input required name='email' onChange={onChangeHandler} value={data.email} type='email' placeholder='Email address' />
+        <input required name='street' onChange={onChangeHandler} value={data.street} type='text' placeholder='Street' />
         <div className='multi-fields'>
-          < input required name='city' onChange={onChangeHandler} value={data.city} type='text' placeholder='City' />
-          < input required name='state' onChange={onChangeHandler} value={data.state} type='text' placeholder='State' />
+          <input required name='city' onChange={onChangeHandler} value={data.city} type='text' placeholder='City' />
+          <input required name='state' onChange={onChangeHandler} value={data.state} type='text' placeholder='State' />
         </div>
         <div className='multi-fields'>
-          < input required name='zipcode' onChange={onChangeHandler} value={data.zipcode} type='text' placeholder='Zip code' />
-          < input required name='country' onChange={onChangeHandler} value={data.country} type='text' placeholder='Country' />
+          <input required name='zipcode' onChange={onChangeHandler} value={data.zipcode} type='text' placeholder='Zip code' />
+          <input required name='country' onChange={onChangeHandler} value={data.country} type='text' placeholder='Country' />
         </div>
-        < input required name='phone' onChange={onChangeHandler} value={data.phone} type='text' placeholder='Phone' />
+        <input required name='phone' onChange={onChangeHandler} value={data.phone} type='text' placeholder='Phone' />
       </div>
       <div className="place-order-right">
         <div className="cart-total">
@@ -102,7 +128,8 @@ const Placeholder = () => {
         </div>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default Placeholder
+export default Placeholder;
+

@@ -41,11 +41,17 @@ const StoreContextProvider = (props) => {
     }
     const fetchFoodList = async () => {
         const response = await axios.get(url + "/api/food/list");
-        setFoodlist(response.data.data);
+        setFoodlist(response.data.data || {});
     }
     const loadCartData = async (token) => {
+        try{
         const response = await axios.post(url + "/api/cart/get", {}, { headers: { token } })
-        setCartitems(response.data.cardData);
+        console.log("Cart data from backend:", response.data.cardData);
+        setCartitems(response.data.cardData || {});
+        }catch(error){
+            console.error("Failed to load cart data:", error);
+            setCartitems({}); // fallback to empty object
+        }
     }
     useEffect(() => {
         async function loadData() {

@@ -40,7 +40,17 @@ const removefromCart = async (req, res) => {
 const getCart = async (req, res) => {
     try {
         let userData = await userModel.findById(req.body.userId);
-        let cardData = await userData.cardData;
+        if (!userData) {
+            console.log("User not found");
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        let cardData = userData.cardData;
+        console.log("Card Data:", cardData); // Log cardData to verify
+
+        if (!cardData) {
+            return res.status(400).json({ success: false, message: "No cart data available" });
+        }
         res.json({success:true,cardData})
     }catch(error) {
         console.log(error);

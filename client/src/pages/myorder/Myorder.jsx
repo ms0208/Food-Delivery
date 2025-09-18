@@ -11,7 +11,9 @@ const Myorder = () => {
     const fetchOrders = async () => {
         try {
             const response = await axios.post('http://localhost:4000/api/order/userorders', {}, {
-                headers: { token }
+                headers: {
+                    Authorization: `Bearer ${token}`
+                  }
             });
             console.log("Response:", response.data);
             setData(response.data.data || []);
@@ -38,8 +40,8 @@ const Myorder = () => {
                         <div key={index} className='my-orders-order'>
                             <img src={assets.parcel_icon} alt="Parcel" />
                             <p>
-                                {order.items.map((item, idx) => (
-                                    idx === order.items.length - 1
+                                {order.items.map((item, id) => (
+                                    id === order.items.length - 1
                                         ? `${item.name} x ${item.quantity}`
                                         : `${item.name} x ${item.quantity}, `
                                 ))}

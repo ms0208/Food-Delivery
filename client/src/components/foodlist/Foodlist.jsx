@@ -9,9 +9,9 @@ export const Foodlist = ({ Category }) => {
     <div className='foodlist' id='foodlist'>
       <h2>Top dishes near you</h2>
       <div className="food-display-list">
-        {food_list.map((item, index) => {
+        {food_list.map((item) => {
           if (Category === "All" || Category === item.category) {
-            return <Fooditem key={index} id={item._id} name={item.name} description={item.description} price={item.price} image={item.image} />
+            return <Fooditem key={item._id} id={item._id} name={item.name} description={item.description} price={item.price} image={item.image} />
           }
         })}
       </div>
